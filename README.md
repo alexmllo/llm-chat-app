@@ -22,8 +22,14 @@ This project is a microservices-based web application that allows you to:
 |----------------------|-----------------------------------------------------------------------------|
 | `scraper-embeddings` | Scrapes website content into markdown, generates embeddings with OpenAI     |
 | `chroma-db`          | Vector store using ChromaDB with persistent volume                          |
-| `llm`                | Backend API to handle queries  improve them via Gemini                      |
+| `llm`                | Backend API that processes queries and enhances responses using Gemini      |
 | `frontend`           | Web interface to interact with the chat system                              |
+
+---
+
+## 📊 Architecture Diagram
+
+![Diagram](assets/llm-chat.png)
 
 ---
 
@@ -68,6 +74,17 @@ This will spin up:
 
 ---
 
+## 📚 Adding Dictionary Data
+You can enrich LLM responses with additional structured context using a dictionary file:
+
+- Place your custom dictionary.json inside llm/data/
+
+- This file should contain extra definitions, acronyms, or reference data
+
+- The LLM backend will use this during the query process to improve accuracy and context
+
+---
+
 ## 📂 Folder Structure
 
 ```bash
@@ -98,17 +115,6 @@ This will spin up:
     └── utils/
         └── llm.py
 ```
-
----
-
-## 📚 Adding Dictionary Data
-You can enrich LLM responses with additional structured context using a dictionary file:
-
-- Place your custom dictionary.json inside llm/data/
-
-- This file should contain extra definitions, acronyms, or reference data
-
-- The LLM backend will use this during the query process to improve accuracy and context
 
 ---
 
