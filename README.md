@@ -12,7 +12,7 @@ This project is a microservices-based web application that allows you to:
 
 - 💬 Query them using an LLM (OpenAI or Gemini)
 
-- 🖥️ Interact via a simple React-based frontend
+- 🖥️ Interact via a simple frontend
 
 ---
 
@@ -66,7 +66,7 @@ This will spin up:
 - LLM API on `http://localhost:5050`
 - Frontend on `http://localhost:3000`
 
---
+---
 
 ## 📂 Folder Structure
 
@@ -99,6 +99,8 @@ This will spin up:
         └── llm.py
 ```
 
+---
+
 ## 📚 Adding Dictionary Data
 You can enrich LLM responses with additional structured context using a dictionary file:
 
@@ -108,6 +110,7 @@ You can enrich LLM responses with additional structured context using a dictiona
 
 - The LLM backend will use this during the query process to improve accuracy and context
 
+---
 
 ## 🛠️ Tips & Troubleshooting
 - ✅ Make sure .env is not accidentally ignored or overwritten
@@ -115,6 +118,8 @@ You can enrich LLM responses with additional structured context using a dictiona
 - 🔄 Restart containers if you change .env or environment variables
 
 - 📁 Embeddings are saved inside the ChromaDB persistent volume under ./chromadb/
+
+---
 
 ## 📘 License
 GNU GENERAL PUBLIC License — see LICENSE for details.
