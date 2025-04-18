@@ -1,0 +1,4 @@
+{
+    "prompt_improvement": "Improve the following user prompt for clarity, precision, and effectiveness. Return only the generated prompt. Take into account this will be checked against an embedding DB, so give relevant words. Current prompt '{user_query}'. Useful dictionary and equivalence terms: '{dictionary}'. Current returned embeddings '{current_embeddings}'",
+    "llm_prompt_template": "Answer briefly, clearly to the following question, based on the provided information:\n\nQuestion: '{user_query}'\n\nProvided information:\n'{info}'\n\nShort answer in English:"
+  }

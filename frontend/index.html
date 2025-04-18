@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Chat with any website</title>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+  <div class="container">
+    <h1>Chat with any website</h1>
+
+    <!-- Paso previo: ingresar URL -->
+    <div id="url-form">
+      <input type="text" id="url-input" placeholder="Introduce una URL para procesar" required />
+      <button onclick="processUrl()">Cargar contenido</button>
+    </div>
+
+    <div id="spinner" style="display: none;">
+      <div class="loader"></div>
+      <p>Processing the url...</p>
+    </div>
+    
+     <!-- Chat oculto por defecto -->
+     <div id="chat-container" style="display: none;">
+      <div class="chat-box" id="chat-box"></div>
+      <div id="query-form">
+        <input type="text" id="user-input" placeholder="Ask me anything..." required />
+        <button onclick="sendQuery()">Send</button>
+      </div>
+    </div>
+  </div>
+
+  </div>
+  <script src="app.js"></script>
+</body>
+</html>

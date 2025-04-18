@@ -1,0 +1,6 @@
+chromadb~=0.6.3
+openai
+flask
+flask-cors
+requests
+google-genai

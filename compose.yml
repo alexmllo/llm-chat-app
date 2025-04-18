@@ -1,0 +1,61 @@
+services:
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - scraper-embeddings
+      - llm
+    networks:
+      - frontend
+      - backend
+
+  scraper-embeddings:
+    build: ./embeddings
+    ports:
+      - "8080:8080"
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - CHROMA_HOST=chroma-db
+      - CHROMA_PORT=8000
+    volumes:
+      - ./markdowns:/app/markdowns
+    depends_on:
+      - chroma-db
+    networks:
+      - frontend
+      - backend
+    
+  llm:
+    build: ./llm
+    ports:
+      - "5050:5050"
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - CHROMA_HOST=chroma-db
+      - CHROMA_PORT=8000
+    depends_on:
+      - chroma-db
+    networks:
+      - frontend
+      - backend
+
+  chroma-db:
+    image: chromadb/chroma:latest
+    ports:
+      - "8000:8000"
+    environment:
+      - IS_PERSISTENT=TRUE
+      - PERSIST_DIRECTORY=/chroma/my_db # this is the default path, change it as needed
+      - ANONYMIZED_TELEMETRY=${ANONYMIZED_TELEMETRY:-TRUE}
+    networks:
+      - backend
+
+volumes:
+  markdowns:
+
+networks:
+  frontend:
+  backend:

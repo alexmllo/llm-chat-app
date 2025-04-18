@@ -1,0 +1,8 @@
+beautifulsoup4
+markdownify
+markdown
+openai
+chromadb
+flask
+flask-cors
+requests
