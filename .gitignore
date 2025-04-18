@@ -16,4 +16,4 @@ chromadb_store/
 web_markdowns/
 __pycache__/
 .vscode/
-markdown/
+markdowns/

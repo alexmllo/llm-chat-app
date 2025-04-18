@@ -39,9 +39,9 @@ collection = chroma_client.get_or_create_collection(name="memory")
 openai_client = openai.OpenAI(api_key=OPENAI_API_KEY)
 genai_client = genai.Client(api_key=GEMINI_API_KEY)
 
-# Cargar el diccionario desde el JSON
-with open('data/acronims.json', 'r', encoding='utf-8') as f:
-    acronimos_fib = json.load(f)
+# Load dictionary.json
+with open('data/dictionary.json', 'r', encoding='utf-8') as f:
+    dictionary = json.load(f)
 
 
 def split_large_text(text, max_tokens=MAX_TOKENS):
@@ -66,21 +66,40 @@ def get_openai_embedding(text):
     return embeddings[0]
 
 def improve_user_prompt(user_prompt):
-    # Obtener contexto relevante
-    # Split robusto usando expresiones regulares
+    # Extract words robustly
     palabras = re.split(r'[,\s.!?¿¡;:\(\)\[\]\{\}]+', user_prompt)
 
-    # Obtener contexto relevante
-    contexto = ", ".join(f"{k}={acronimos_fib[k]}" for k in palabras if k in acronimos_fib)
+    # Get detailed context for known acronyms
+    contexto_items = []
+    for palabra in palabras:
+        if palabra in dictionary:
+            entry = dictionary[palabra]
+            details = [f"**{palabra}**"]
+            if 'es' in entry:
+                details.append(f"es: {entry['es']}")
+            if 'en' in entry:
+                details.append(f"en: {entry['en']}")
+            if 'description' in entry:
+                details.append(f"desc: {entry['description']}")
+            if 'type' in entry:
+                details.append(f"type: {entry['type']}")
+            contexto_items.append(" | ".join(details))
 
+    contexto = "\n".join(contexto_items)
+
+    # Get semantic embedding results
     query_embedding = get_openai_embedding(user_prompt)
-
     results = collection.query(query_embeddings=query_embedding, n_results=6)
-
     info = "".join([f"- {meta['sentence']}\n" for meta in results["metadatas"][0]])
 
-    prompt = PROMPT_IMPROVEMENT.format(user_query=user_prompt, dictionary= contexto, current_embeddings=info)
+    # Format final prompt
+    prompt = PROMPT_IMPROVEMENT.format(
+        user_query=user_prompt,
+        dictionary=contexto,
+        current_embeddings=info
+    )
 
+    # Call LLM
     response = genai_client.models.generate_content(
         model="gemini-2.0-flash", contents=prompt
     )
