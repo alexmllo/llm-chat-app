@@ -91,6 +91,8 @@ You can enrich LLM responses with additional structured context using a dictiona
 .
 ├── LICENSE
 ├── README.md
+├── assets/
+│   └── llm-chat.png
 ├── compose.yml
 ├── embeddings/
 │   ├── Dockerfile
