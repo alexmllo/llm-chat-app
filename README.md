@@ -38,8 +38,8 @@ This project is a microservices-based web application that allows you to:
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/your-user/llm-chat.git
-cd llm-chat
+git clone https://github.com/your-user/llm-chat-app.git
+cd llm-chat-app
 ```
 
 ### 2. Setup Environment Variables
