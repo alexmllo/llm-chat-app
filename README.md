@@ -1,6 +1,18 @@
 # 🧠 LLM Chat Web App with Embeddings & ChromaDB
 
-This project is a microservices-based web app that allows you to scrape websites, convert content to markdown, generate embeddings using OpenAI, store them in ChromaDB, and query them via an LLM API—all connected to a React frontend for easy interaction.
+This project is a microservices-based web application that allows you to:
+
+- 🕸️ Scrape and parse website content
+
+- 📝 Convert it into Markdown
+
+- 🧬 Generate vector embeddings using OpenAI
+
+- 🧠 Store them in ChromaDB
+
+- 💬 Query them using an LLM (OpenAI or Gemini)
+
+- 🖥️ Interact via a simple React-based frontend
 
 ---
 
@@ -10,8 +22,8 @@ This project is a microservices-based web app that allows you to scrape websites
 |----------------------|-----------------------------------------------------------------------------|
 | `scraper-embeddings` | Scrapes website content into markdown, generates embeddings with OpenAI     |
 | `chroma-db`          | Vector store using ChromaDB with persistent volume                          |
-| `llm`                | Backend API to handle queries via OpenAI or Gemini using ChromaDB data      |
-| `frontend`           | React frontend to interact with the LLM-based chatbot interface             |
+| `llm`                | Backend API to handle queries  improve them via Gemini                      |
+| `frontend`           | Web interface to interact with the chat system                              |
 
 ---
 
@@ -21,16 +33,24 @@ This project is a microservices-based web app that allows you to scrape websites
 
 ```bash
 git clone https://github.com/your-user/llm-chat.git
-cd llm-chat-app
+cd llm-chat
 ```
 
 ### 2. Setup Environment Variables
 Create a .env file at the root of the project with the following content:
 
-```env
+```bash
 OPENAI_API_KEY=your_openai_key
 GEMINI_API_KEY=your_gemini_key
 ANONYMIZED_TELEMETRY=FALSE
+```
+    ⚠️ Make sure these variables are accessible by Docker Compose when running the containers.
+
+Alternatively, you can export them manually:
+
+```bash
+export OPENAI_API_KEY=your_openai_key
+export GEMINI_API_KEY=your_gemini_key
 ```
 
 ### 3. Run the App
@@ -54,8 +74,8 @@ This will spin up:
 .
 ├── LICENSE
 ├── README.md
-├── compose.yml                  # Docker Compose setup for all services
-├── embeddings/                 # Scraper and embedding generator service
+├── compose.yml
+├── embeddings/
 │   ├── Dockerfile
 │   ├── app.py
 │   ├── requirements.txt
@@ -63,24 +83,38 @@ This will spin up:
 │       ├── createEmbeddingsDB.py
 │       ├── extractWebInfo.py
 │       └── scraper.py
-├── frontend/                   # Frontend UI to interact with the LLM
+├── frontend/
 │   ├── Dockerfile
 │   ├── app.js
 │   ├── index.html
 │   └── style.css
-└── llm/                        # Backend service to query the embeddings with LLMs
+└── llm/
     ├── Dockerfile
     ├── app.py
     ├── data/
-    │   ├── acronims.json
+    │   ├── dictionary.json
     │   └── config.json
     ├── requirements.txt
     └── utils/
         └── llm.py
 ```
 
-## Services
-- **Frontend**: A simple UI for entering queries and displaying results.
-- **Scraper & Embeddings**: Scrapes web content and converts it into markdown files and OpenAI embeddings stored in a ChromaDB database.
-- **LLM Backend**: Handles user queries and retrieves relevant information using OpenAI and Gemini APIs.
-- **ChromaDB**: A persistent vector database that stores and serves embeddings.
+## 📚 Adding Dictionary Data
+You can enrich LLM responses with additional structured context using a dictionary file:
+
+- Place your custom dictionary.json inside llm/data/
+
+- This file should contain extra definitions, acronyms, or reference data
+
+- The LLM backend will use this during the query process to improve accuracy and context
+
+
+## 🛠️ Tips & Troubleshooting
+- ✅ Make sure .env is not accidentally ignored or overwritten
+
+- 🔄 Restart containers if you change .env or environment variables
+
+- 📁 Embeddings are saved inside the ChromaDB persistent volume under ./chromadb/
+
+## 📘 License
+GNU GENERAL PUBLIC License — see LICENSE for details.
