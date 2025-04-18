@@ -1,0 +1,166 @@
+{
+  "FIB": {
+    "es": "Facultat d'Informàtica de Barcelona",
+    "en": "Barcelona School of Informatics",
+    "type": "organization"
+  },
+  "UPC": {
+    "es": "Universitat Politècnica de Catalunya",
+    "en": "Polytechnic University of Catalonia",
+    "type": "organization"
+  },
+  "ICFO": {
+    "es": "Instituto de Ciencias Fotónicas",
+    "en": "Institute of Photonic Sciences",
+    "type": "organization"
+  },
+  "OW": {
+    "es": "Semana de orientación",
+    "en": "Orientation Week",
+    "description": "Programa de 2 días que incluye bienvenida institucional, información sobre trámites y servicios universitarios",
+    "type": "program"
+  },
+  "TOEFL": {
+    "en": "Test of English as a Foreign Language",
+    "type": "certificate"
+  },
+  "IELTS": {
+    "en": "International English Language Testing System",
+    "type": "certificate"
+  },
+  "TFM": {
+    "es": "Trabajo de Fin de Máster",
+    "en": "Master’s Thesis",
+    "type": "academic requirement"
+  },
+  "ECTS": {
+    "es": "Sistema Europeo de Transferencia de Créditos",
+    "en": "European Credit Transfer System",
+    "description": "Sistema para estandarizar el reconocimiento académico en Europa",
+    "type": "academic credit"
+  },
+  "AI": {
+    "es": "Inteligencia Artificial",
+    "en": "Artificial Intelligence",
+    "type": "technology"
+  },
+  "ML": {
+    "es": "Aprendizaje Automático",
+    "en": "Machine Learning",
+    "type": "technology"
+  },
+  "CV": {
+    "es": "Visión por Computador",
+    "en": "Computer Vision",
+    "type": "technology"
+  },
+  "NLP": {
+    "es": "Procesamiento del Lenguaje Natural",
+    "en": "Natural Language Processing",
+    "type": "technology"
+  },
+  "GPU": {
+    "en": "Graphics Processing Unit",
+    "description": "Hardware especializado para procesamiento paralelo, comúnmente usado en IA",
+    "type": "hardware"
+  },
+  "AWS": {
+    "en": "Amazon Web Services",
+    "type": "cloud platform"
+  },
+  "GCP": {
+    "en": "Google Cloud Platform",
+    "type": "cloud platform"
+  },
+  "Azure": {
+    "en": "Microsoft Azure",
+    "type": "cloud platform"
+  },
+  "K8s": {
+    "en": "Kubernetes",
+    "description": "Sistema de orquestación de contenedores de código abierto",
+    "type": "infrastructure"
+  },
+  "TF": {
+    "en": "TensorFlow",
+    "description": "Framework de aprendizaje automático de código abierto desarrollado por Google",
+    "type": "framework"
+  },
+  "PyTorch": {
+    "en": "PyTorch",
+    "description": "Framework de aprendizaje profundo desarrollado por Facebook",
+    "type": "framework"
+  },
+  "GPT": {
+    "en": "Generative Pre-trained Transformer",
+    "type": "language model"
+  },
+  "SQL": {
+    "en": "Structured Query Language",
+    "type": "language"
+  },
+  "CI/CD": {
+    "en": "Continuous Integration / Continuous Deployment",
+    "type": "devops process"
+  },
+  "API": {
+    "en": "Application Programming Interface",
+    "type": "interface"
+  },
+  "HTTP": {
+    "en": "HyperText Transfer Protocol",
+    "type": "protocol"
+  },
+  "REST": {
+    "en": "Representational State Transfer",
+    "type": "architecture"
+  },
+  "JSON": {
+    "en": "JavaScript Object Notation",
+    "type": "data format"
+  },
+  "BSc": {
+    "en": "Bachelor of Science",
+    "type": "degree"
+  },
+  "MSc": {
+    "en": "Master of Science",
+    "type": "degree"
+  },
+  "PhD": {
+    "en": "Doctor of Philosophy",
+    "type": "degree"
+  },
+  "GPA": {
+    "en": "Grade Point Average",
+    "type": "academic metric"
+  },
+  "QA": {
+    "en": "Quality Assurance",
+    "type": "process"
+  },
+  "UX": {
+    "en": "User Experience",
+    "type": "design"
+  },
+  "UI": {
+    "en": "User Interface",
+    "type": "design"
+  },
+  "PDF": {
+    "en": "Portable Document Format",
+    "type": "file format"
+  },
+  "CSV": {
+    "en": "Comma-Separated Values",
+    "type": "file format"
+  },
+  "IDE": {
+    "en": "Integrated Development Environment",
+    "type": "tool"
+  },
+  "VSCode": {
+    "en": "Visual Studio Code",
+    "type": "IDE"
+  }
+}
