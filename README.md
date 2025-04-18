@@ -78,3 +78,9 @@ This will spin up:
     └── utils/
         └── llm.py
 ```
+
+## Services
+- **Frontend**: A simple UI for entering queries and displaying results.
+- **Scraper & Embeddings**: Scrapes web content and converts it into markdown files and OpenAI embeddings stored in a ChromaDB database.
+- **LLM Backend**: Handles user queries and retrieves relevant information using OpenAI and Gemini APIs.
+- **ChromaDB**: A persistent vector database that stores and serves embeddings.
