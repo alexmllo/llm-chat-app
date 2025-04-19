@@ -50,11 +50,14 @@ services:
       - IS_PERSISTENT=TRUE
       - PERSIST_DIRECTORY=/chroma/my_db # this is the default path, change it as needed
       - ANONYMIZED_TELEMETRY=${ANONYMIZED_TELEMETRY:-TRUE}
+    volumes:
+      - ./chromadb:/data
     networks:
       - backend
 
 volumes:
   markdowns:
+  chromadb:
 
 networks:
   frontend:

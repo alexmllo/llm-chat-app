@@ -6,3 +6,5 @@ chromadb
 flask
 flask-cors
 requests
+numpy
+docling

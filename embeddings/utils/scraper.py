@@ -152,7 +152,7 @@ def downloadWebsite(url, folder):
 
     pending_urls = [url]
 
-    limit = 5  # Arbitrary limit for safety
+    limit = 20  # Arbitrary limit for safety
     count = 0
 
     while pending_urls and count < limit:

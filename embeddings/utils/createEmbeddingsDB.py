@@ -4,7 +4,7 @@ import markdown
 import re
 import openai
 from bs4 import BeautifulSoup
-# from docling.document_converter import DocumentConverter
+from docling.document_converter import DocumentConverter
 
 # Configuración
 DATA_FOLDER = "../markdowns"
@@ -173,45 +173,45 @@ def process_markdown_file(root, filename):
         print(f"Error deleting file {filename}: {e}")
 
 
-# def process_pdf_file(root, filename):
-#     print("processing PDF file: " + filename)
-#     filepath = os.path.join(root, filename)
+def process_pdf_file(root, filename):
+    print("processing PDF file: " + filename)
+    filepath = os.path.join(root, filename)
 
-#     try:
-#         # Convertir PDF a Markdown usando Docling
-#         converter = DocumentConverter()
-#         result = converter.convert(filepath)
-#         markdown_text = result.document.export_to_markdown()
+    try:
+        # Convertir PDF a Markdown usando Docling
+        converter = DocumentConverter()
+        result = converter.convert(filepath)
+        markdown_text = result.document.export_to_markdown()
 
-#         # Limpiar HTML generado desde el Markdown
-#         text = clean_html(markdown.markdown(markdown_text))
+        # Limpiar HTML generado desde el Markdown
+        text = clean_html(markdown.markdown(markdown_text))
 
-#         # Dividir en frases
-#         sentences = split_into_sentences(text)
+        # Dividir en frases
+        sentences = split_into_sentences(text)
 
-#         # Generar embeddings con OpenAI y guardarlos en ChromaDB
-#         relative_path = os.path.relpath(filepath, DATA_FOLDER)
+        # Generar embeddings con OpenAI y guardarlos en ChromaDB
+        relative_path = os.path.relpath(filepath, DATA_FOLDER)
 
-#         embeddings = get_openai_embedding_pdfs(sentences)
+        embeddings = get_openai_embedding_pdfs(sentences)
 
-#         if embeddings:
-#             for idx, (sentence, embedding) in enumerate(zip(sentences, embeddings)):
-#                 sentence_id = f"{relative_path}_sentence{idx}_part0"
-#                 existing = collection.get(ids=[sentence_id])
-#                 if not existing["ids"]:  # si el ID no existe, lo añadimos
-#                     collection.add(
-#                         ids=[sentence_id],
-#                         embeddings=[embedding],
-#                         metadatas=[{
-#                             "filename": relative_path,
-#                             "sentence": sentence,
-#                             "sentence_index": idx
-#                         }]
-#                     )
+        if embeddings:
+            for idx, (sentence, embedding) in enumerate(zip(sentences, embeddings)):
+                sentence_id = f"{relative_path}_sentence{idx}_part0"
+                existing = collection.get(ids=[sentence_id])
+                if not existing["ids"]:  # si el ID no existe, lo añadimos
+                    collection.add(
+                        ids=[sentence_id],
+                        embeddings=[embedding],
+                        metadatas=[{
+                            "filename": relative_path,
+                            "sentence": sentence,
+                            "sentence_index": idx
+                        }]
+                    )
 
-#         # Eliminar el archivo después de procesarlo
-#         os.remove(filepath)
-#         print(f"Deleted file: {filename}")
+        # Eliminar el archivo después de procesarlo
+        os.remove(filepath)
+        print(f"Deleted file: {filename}")
 
     except Exception as e:
         print(f"Error processing PDF {filename}: {e}")
@@ -222,7 +222,6 @@ def process_folder_files(base_folder):
     for root, _, files in os.walk(DATA_FOLDER):
         for filename in files:
             if(filename.endswith(".pdf")):
-                continue
                 process_pdf_file(root, filename)
             elif filename.endswith(".md"):
                 process_markdown_file(root, filename)
