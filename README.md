@@ -12,7 +12,9 @@ This project is a microservices-based web application that allows you to:
 
 - 💬 Query them using an LLM (OpenAI or Gemini)
 
-- 🖥️ Interact via a simple frontend
+- 🖥️ Interact via a frontend
+
+- 🔄 Dynamically add more content: While you're chatting, you can initiate additional scrapes to download and embed more information into the database without restarting the service.
 
 ---
 
@@ -48,7 +50,7 @@ Create a .env file at the root of the project with the following content:
 ```bash
 OPENAI_API_KEY=your_openai_key
 GEMINI_API_KEY=your_gemini_key
-ANONYMIZED_TELEMETRY=FALSE
+MAX_FILES=number_of_files_to_download
 ```
     ⚠️ Make sure these variables are accessible by Docker Compose when running the containers.
 
