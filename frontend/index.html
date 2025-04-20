@@ -3,26 +3,38 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Chat with any website</title>
+  <title>DGSI Chatbot</title>
   <link rel="stylesheet" href="style.css"/>
-</head>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap" rel="stylesheet"></head>
 <body>
+<div class="main-div">
   <div class="container">
-    <h1>Chat with any website</h1>
-
-    <!-- Paso previo: ingresar URL -->
-    <div id="url-form">
-      <input type="text" id="url-input" placeholder="Introduce una URL para procesar" required />
-      <button onclick="processUrl()">Cargar contenido</button>
+    <h1>DGSI Chatbot</h1>
+  </div>
+  <div class="container">
+    <div id="load-more-websites">
+      <h3>Need more data? Load more websites!</h3>
+      <div id="url-form">
+        <input type="text" id="url-input" placeholder="Enter an URL to scratch a website" required />
+        <button onclick="processUrl()">Scratch website</button>
+      </div>
     </div>
 
     <div id="spinner" style="display: none;">
-      <div class="loader"></div>
-      <p>Processing the url...</p>
+      <div class="loading-content">
+        <div class="loader"></div>
+        <p>Processing the url...</p>
+      </div>
     </div>
-    
-     <!-- Chat oculto por defecto -->
-     <div id="chat-container" style="display: none;">
+     <div id="load-message" style="display: none;">
+
+    </div>
+  </div>
+
+     <div id="chat-container" class="container container-chat">
+      <h3>Chat with the LLM</h3>
       <div class="chat-box" id="chat-box"></div>
       <div id="query-form">
         <input type="text" id="user-input" placeholder="Ask me anything..." required />
@@ -31,7 +43,6 @@
     </div>
   </div>
 
-  </div>
   <script src="app.js"></script>
 </body>
 </html>

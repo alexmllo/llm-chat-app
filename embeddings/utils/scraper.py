@@ -19,6 +19,12 @@ visited_urls = set()
 
 pending_urls=[]
 
+MAX_FILES = os.getenv("MAX_FILES")
+if(MAX_FILES == None):
+    MAX_FILES = 5
+else:
+    MAX_FILES = int(MAX_FILES)
+
 def url_to_filepath(url, is_pdf=False):
     """
     Convert a URL to a valid file path with subfolders.
@@ -27,7 +33,7 @@ def url_to_filepath(url, is_pdf=False):
     """
     path = urlparse(url).path.strip("/")
     if not path or path == "/":
-        return os.path.join(SAVE_FOLDER, "index.md")
+        return os.path.join(SAVE_FOLDER, "_index.md")
 
     # Ensure the full folder structure exists
     full_path = os.path.join(SAVE_FOLDER, path)
@@ -81,12 +87,6 @@ def download_pdf(url):
 
 def scrape_page(url, base_url):
     """Extracts content from a webpage and converts it to Markdown."""
-    if should_ignore_url(url):
-        print(f"Ignoring page: {url}")
-        return None
-
-    if url in visited_urls:
-        return None
 
     print(f"Scraping: {url}")
 
@@ -141,7 +141,7 @@ def scrape_page(url, base_url):
     return md_filepath
 
 
-def downloadWebsite(url, folder):
+def downloadWebsite(url, folder, task_id, progress_dict):
     global pending_urls
     global SAVE_FOLDER
 
@@ -152,11 +152,21 @@ def downloadWebsite(url, folder):
 
     pending_urls = [url]
 
-    limit = 20  # Arbitrary limit for safety
     count = 0
 
-    while pending_urls and count < limit:
+    while pending_urls and count < MAX_FILES:
         current_url = pending_urls.pop(0)
+
+        if should_ignore_url(current_url):
+            print(f"Ignoring page: {current_url}")
+            continue
+
+        if current_url in visited_urls:
+            continue
+
+        this_task = f"Downloading {current_url}..."
+        progress_dict[task_id]['text'] += "\n" + this_task
+
         filename = scrape_page(current_url, base_url)
 
         if filename:
@@ -173,6 +183,10 @@ def downloadWebsite(url, folder):
                         absolute_link):
                     pending_urls.append(absolute_link)
 
+        progress_dict[task_id]['text'] = progress_dict[task_id]['text'].replace(
+            this_task,
+            f"✅ Downloaded {current_url}"
+        )
         count += 1
 
     print("✅ Download complete!")

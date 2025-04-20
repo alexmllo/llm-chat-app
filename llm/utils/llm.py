@@ -17,7 +17,7 @@ with open(CONFIG_FILE, 'r', encoding='utf-8') as config_file:
 PROMPT_IMPROVEMENT = config["prompt_improvement"]
 LLM_PROMPT_TEMPLATE = config["llm_prompt_template"]
 
-CHROMA_DB_FOLDER = "chromadb_store_en"
+# CHROMA_DB_FOLDER = "chromadb_store_en"
 OPENAI_MODEL = "text-embedding-3-small"
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
@@ -109,7 +109,7 @@ def extract_response(full_response, prompt_marker):
     return full_response.split(prompt_marker)[-1].strip() if prompt_marker in full_response else full_response.strip()
 
 # Interactive search
-def handle_query(query:str):
+def handle_query(query:str) -> tuple:
 
     # Improve user query using LLM
     improved_query = improve_user_prompt(query)
@@ -118,7 +118,7 @@ def handle_query(query:str):
     query_embedding = get_openai_embedding(improved_query)
     if not query_embedding:
         print("Error generating embedding for query.")
-        return
+        return ("Error generating embedding for query.", False)
 
     # Query ChromaDB
     results = collection.query(
@@ -128,7 +128,7 @@ def handle_query(query:str):
 
     if not results["ids"] or not results["ids"][0]:
         print("No relevant info found.")
-        return
+        return ("No relevant info found.", False)
 
     # Build context information
     info = ""
@@ -148,4 +148,4 @@ def handle_query(query:str):
     clean_response = extract_response(response.text, prompt_marker)
     print("\nAnswer from LLM:\n")
     print(response.text)
-    return response.text
+    return (response.text, True)

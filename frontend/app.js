@@ -12,21 +12,15 @@ document.getElementById("url-input").addEventListener("keypress", function (e) {
 
 async function processUrl() {
   const url = document.getElementById("url-input").value.trim();
-  const url_form = document.getElementById("url-form");
-  const spinner = document.getElementById("spinner");
+  const loadMessage = document.getElementById("load-message");
 
   if (!url) return;
 
-  url_form.style.display = "none";
+  loadMessage.style.display = "block"
+  loadMessage.classList.add('loading')
 
-  // Mostrar mensaje con spinner
-  spinner.style.display = "block";
-
-  // Forzar repintado para mostrar spinner antes del fetch
-  await new Promise(resolve => setTimeout(resolve, 50));
-
-  try {
-    const response = await fetch("http://localhost:8080/downloadWebsite", {
+  document.getElementById("chat-container").style.display = "none";
+      const response = await fetch("http://localhost:8080/downloadWebsite", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
@@ -34,21 +28,45 @@ async function processUrl() {
       body: JSON.stringify({ url: url })
     });
 
-    const data = await response.text(); // <-- tu backend devuelve texto plano
+    const { task_id } = await response.json();
 
-    if (response.ok) {
-      spinner.style.display = "none";
-      document.getElementById("chat-container").style.display = "block";
-    } else {
-      agentMessage.innerHTML = "❌ Error al procesar la URL: " + data;
-    }
-  } catch (error) {
-    agentMessage.innerHTML = "❌ Error al conectar con el servidor.";
-    console.error(error);
-  }
+    checkProgress(task_id);
 
 }
 
+async function checkProgress(taskId) {
+  const loadMessage = document.getElementById("load-message");
+
+  try {
+    const response = await fetch(`http://localhost:8080/progress/${taskId}`);
+    const { status, text } = await response.json();
+
+    if (status === "done") {
+      loadMessage.innerText = text
+      document.getElementById("chat-container").style.display = "grid";
+      loadMessage.classList.remove('loading')
+
+    } else if (status === "error") {
+      loadMessage.innerText = `❌ Error: ${text}`;
+      loadMessage.classList.remove('loading')
+      document.getElementById("chat-container").style.display = "grid";
+    } else {
+      // Seguir comprobando cada 2 segundos
+      loadMessage.innerText = text
+      loadMessage.scrollTo({
+          top: loadMessage.scrollHeight,
+          behavior: "smooth"
+        });
+      setTimeout(() => checkProgress(taskId), 200);
+    }
+  } catch (err) {
+    console.error(err);
+    document.getElementById("chat-container").style.display = "grid";
+    loadMessage.innerText = "❌ Error checking progress.";
+    loadMessage.classList.remove('loading')
+
+  }
+}
 
 async function sendQuery() {
   const inputEl = document.getElementById("user-input");
@@ -66,7 +84,7 @@ async function sendQuery() {
   // Mensaje de espera de la IA
   const agentMessage = document.createElement("div");
   agentMessage.className = "chat-message agent";
-  agentMessage.textContent = "Pensando...";
+  agentMessage.textContent = "Thinking...";
   chatBox.appendChild(agentMessage);
 
   chatBox.scrollTop = chatBox.scrollHeight;
@@ -84,7 +102,11 @@ async function sendQuery() {
     // const response = await fetch(url);
     const data = await response.text();
 
-    agentMessage.textContent = `${data}`;
+    const formattedData = data
+      .replace(/\n/g, "<br>")
+      .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
+
+    agentMessage.innerHTML = `${formattedData}`;
   } catch (error) {
     agentMessage.textContent = "Error - No se pudo conectar con el servidor.";
     console.error(error);
