@@ -29,12 +29,6 @@ This project is a microservices-based web application that allows you to:
 
 ---
 
-## 📊 Architecture Diagram
-
-![Diagram](assets/llm-chat.png)
-
----
-
 ## 🚀 Getting Started
 
 ### 1. Clone the repository
