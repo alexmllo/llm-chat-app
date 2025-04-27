@@ -12,58 +12,74 @@ document.getElementById("url-input").addEventListener("keypress", function (e) {
 
 async function processUrl() {
   const url = document.getElementById("url-input").value.trim();
+  if (!url) {
+    return;
+  }
+  const processForm = document.getElementById("url-form");
+  processForm.classList.add("disabled")
+
   const loadMessage = document.getElementById("load-message");
-
-  if (!url) return;
-
   loadMessage.style.display = "block"
   loadMessage.classList.add('loading')
 
   document.getElementById("chat-container").style.display = "none";
-      const response = await fetch("http://localhost:8080/downloadWebsite", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({ url: url })
-    });
 
-    const { task_id } = await response.json();
+  const baseUrl = `${window.location.protocol}//${window.location.hostname}:${window.location.port}`;
+  const response = await fetch(`${baseUrl}/downloadWebsite`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({url: url})
+  });
 
-    checkProgress(task_id);
+  const {task_id} = await response.json();
 
+  checkProgress(task_id);
 }
 
 async function checkProgress(taskId) {
   const loadMessage = document.getElementById("load-message");
-
+  const processForm = document.getElementById("url-form");
   try {
-    const response = await fetch(`http://localhost:8080/progress/${taskId}`);
+
+    const baseUrl = `${window.location.protocol}//${window.location.hostname}:${window.location.port}`;
+    const response = await fetch(`${baseUrl}/progress/${taskId}`);
     const { status, text } = await response.json();
 
     if (status === "done") {
       loadMessage.innerText = text
       document.getElementById("chat-container").style.display = "grid";
+      processForm.classList.remove("disabled")
       loadMessage.classList.remove('loading')
-
+      document.getElementById("url-input").value = "";
     } else if (status === "error") {
       loadMessage.innerText = `❌ Error: ${text}`;
       loadMessage.classList.remove('loading')
+      processForm.classList.remove("disabled")
       document.getElementById("chat-container").style.display = "grid";
     } else {
-      // Seguir comprobando cada 2 segundos
-      loadMessage.innerText = text
-      loadMessage.scrollTo({
+        // Guardar si estaba abajo antes de cambiar el texto
+      const wasAtBottom = loadMessage.scrollTop + loadMessage.clientHeight >= loadMessage.scrollHeight - 5;
+
+      // Actualizar el texto
+      loadMessage.innerText = text;
+
+      // Hacer scroll solo si estaba abajo antes
+      if (wasAtBottom) {
+        loadMessage.scrollTo({
           top: loadMessage.scrollHeight,
           behavior: "smooth"
         });
-      setTimeout(() => checkProgress(taskId), 200);
+      }
+      setTimeout(() => checkProgress(taskId), 500);
     }
   } catch (err) {
     console.error(err);
     document.getElementById("chat-container").style.display = "grid";
     loadMessage.innerText = "❌ Error checking progress.";
-    loadMessage.classList.remove('loading')
+    loadMessage.classList.remove('loading');
+    processForm.classList.remove("disabled")
 
   }
 }
@@ -91,20 +107,21 @@ async function sendQuery() {
   inputEl.value = "";
 
   try {
-    const response = await fetch("http://localhost:5050/query", {
+    const baseUrl = `${window.location.protocol}//${window.location.hostname}:${window.location.port}`;
+
+    const response = await fetch(`${baseUrl}/query`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
       },
-      body: JSON.stringify({ query: input })
+      body: JSON.stringify({query: input})
     });
-    // const url = `${window.location.origin}/query?query=${encodeURIComponent(input)}`;
-    // const response = await fetch(url);
+
     const data = await response.text();
 
     const formattedData = data
-      .replace(/\n/g, "<br>")
-      .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
+        .replace(/\n/g, "<br>")
+        .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
 
     agentMessage.innerHTML = `${formattedData}`;
   } catch (error) {

@@ -62,6 +62,7 @@ def process_website_task(task_id, url):
         }
         extractWebInfo(url, task_id, progress_dict)
         progress_dict[task_id]['status'] = "done"
+        progress_dict[task_id]['text'] += f"\n✅ Finished scrapping {url}!"
     except Exception as e:
         progress_dict[task_id] = {"status":"error", "text":str(e)}
 
@@ -71,6 +72,10 @@ def get_progress(task_id):
     data = progress_dict.get(task_id)
     if data is None:
         return jsonify({"status": "not_found", "text": ""})
+
+    #If status is error or finished, remove from progresses
+    if data["status"] != "working":
+        progress_dict.pop(task_id)
     return jsonify(data)
 
 

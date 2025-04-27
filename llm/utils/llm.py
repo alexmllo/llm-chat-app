@@ -8,7 +8,7 @@ import re
 # Configuration paths
 CONFIG_FILE = "data/config.json"
 
-print(os.getcwd())
+chat_history = []
 
 # Load configurations
 with open(CONFIG_FILE, 'r', encoding='utf-8') as config_file:
@@ -25,6 +25,10 @@ GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 MAX_CALLS = 100000
 MAX_TOKENS = 16000
 call_count = 0
+
+MAX_CHAT_HISTORY =  config["max_chat_history"]
+if MAX_CHAT_HISTORY is None:
+    MAX_CHAT_HISTORY = 6
 
 if not OPENAI_API_KEY or not GEMINI_API_KEY:
     raise ValueError("Missing API keys. Check your environment variables.")
@@ -65,11 +69,64 @@ def get_openai_embedding(text):
 
     return embeddings[0]
 
-def improve_user_prompt(user_prompt):
-    # Extract words robustly
-    palabras = re.split(r'[,\s.!?¿¡;:\(\)\[\]\{\}]+', user_prompt)
+def call_openai(prompt: str) -> str:
+    response = openai_client.chat.completions.create(
+        model="gpt-4o-mini-2024-07-18",
+        messages=[
+            {"role": "user", "content": prompt}
+        ],
+        temperature=0.7
+    )
+    return response.choices[0].message.content
 
-    # Get detailed context for known acronyms
+def extract_idx_from_id(sentence_id):
+    # Extrae el índice numérico de algo como 'ruta/sentence23_part0'
+    match = re.search(r'_sentence(\d+)_part\d+', sentence_id)
+    return int(match.group(1)) if match else None
+
+def get_embedding_results_info(query_embedding, results, join_x_sentences):
+
+    results = collection.query(query_embeddings=query_embedding, n_results=results)
+
+    all_ids = []
+
+    info =""
+    for current_id in results['ids'][0]:
+        current_neighbors=[]
+        idx = extract_idx_from_id(current_id)
+        if idx is None:
+            continue
+        # Genera los IDs de la frase actual y las +/-2 vecinas
+        base_path = current_id.split("_sentence")[0]
+        for offset in range(-join_x_sentences, join_x_sentences + 1):
+            neighbor_idx = idx + offset
+            if neighbor_idx < 0:
+                continue
+            neighbor_id = f"{base_path}_sentence{neighbor_idx}_part0"
+            current_neighbors.append(neighbor_id)
+            #all_ids.append(neighbor_id)
+
+        # Elimina duplicados preservando el orden
+        unique_ids = list(OrderedDict.fromkeys(current_neighbors))
+        if len(unique_ids) == 0:
+            continue
+        neighbors = collection.get(ids=unique_ids)
+        info += "".join([f"- {meta['sentence']}\n" for meta in neighbors["metadatas"]]) + "\n\n\n\n\n"
+
+    if info == "":
+        return None
+
+    return info
+
+def improve_user_prompt(user_prompt, chat_history_local):
+    # Asegurarse de que solo se usan los últimos 5 mensajes
+    last_turns = chat_history_local[-8:]
+    formatted_history = ""
+    for turn in last_turns:
+        formatted_history += f"{turn['role'].capitalize()}: {turn['content']}\n"
+
+    # Extraer términos útiles del diccionario
+    palabras = re.split(r'[,\s.!?¿¡;:\(\)\[\]\{\}]+', user_prompt)
     contexto_items = []
     for palabra in palabras:
         if palabra in dictionary:
@@ -87,65 +144,59 @@ def improve_user_prompt(user_prompt):
 
     contexto = "\n".join(contexto_items)
 
-    # Get semantic embedding results
+    # Obtener embeddings para esta consulta
     query_embedding = get_openai_embedding(user_prompt)
-    results = collection.query(query_embeddings=query_embedding, n_results=6)
-    info = "".join([f"- {meta['sentence']}\n" for meta in results["metadatas"][0]])
 
-    # Format final prompt
-    prompt = PROMPT_IMPROVEMENT.format(
+    info = get_embedding_results_info(query_embedding, 14, 1)
+
+    if info is None:
+        return None
+    # Construir el nuevo prompt con historial
+    full_prompt = PROMPT_IMPROVEMENT.format(
         user_query=user_prompt,
+        chat_history=formatted_history,
         dictionary=contexto,
         current_embeddings=info
     )
 
-    # Call LLM
-    response = genai_client.models.generate_content(
-        model="gemini-2.0-flash", contents=prompt
-    )
-    return response.text
+    improved_prompt = call_openai(full_prompt)
+    return improved_prompt
 
 def extract_response(full_response, prompt_marker):
     return full_response.split(prompt_marker)[-1].strip() if prompt_marker in full_response else full_response.strip()
 
-# Interactive search
-def handle_query(query:str) -> tuple:
+def handle_query(query: str, chat_history: list):
 
-    # Improve user query using LLM
-    improved_query = improve_user_prompt(query)
+    # Mejorar la consulta con historial
+    improved_query = improve_user_prompt(query, chat_history)
 
-    # Generate query embedding
+    if improved_query is None :
+        print("No relevant info found.")
+        return "No relevant information found."
+
+    # Guardar prompt mejorado en historial antes de la respuesta
     query_embedding = get_openai_embedding(improved_query)
     if not query_embedding:
-        print("Error generating embedding for query.")
-        return ("Error generating embedding for query.", False)
+        return "Error generating embedding for query."
 
-    # Query ChromaDB
-    results = collection.query(
-        query_embeddings=query_embedding,
-        n_results=6
-    )
+    info = get_embedding_results_info(query_embedding, 15,1)
 
-    if not results["ids"] or not results["ids"][0]:
+    if info is None:
         print("No relevant info found.")
-        return ("No relevant info found.", False)
+        return "No relevant information found."
 
-    # Build context information
-    info = ""
-    for idx, metadata in enumerate(results["metadatas"][0]):
-        sentence = results["metadatas"][0][idx]['sentence']
-        info += f"- {sentence}\n"
+    final_prompt = LLM_PROMPT_TEMPLATE.format(user_query=query, improved_query=improved_query, info=info)
+    response = call_openai(final_prompt)
 
-    # Build LLM prompt
-    prompt = LLM_PROMPT_TEMPLATE.format(user_query=improved_query, info=info)
-    prompt_marker = "Short answer in English:"
+    # Añadir consulta al historial
+    chat_history.append({"role": "user", "content": improved_query})
 
-    client = genai.Client(api_key=GEMINI_API_KEY)
-    response = client.models.generate_content(
-        model="gemini-2.0-flash", contents=prompt
-    )
+    # Guardar respuesta también en el historial
+    chat_history.append({"role": "assistant", "content": response})
 
-    clean_response = extract_response(response.text, prompt_marker)
+    while(len(chat_history) > MAX_CHAT_HISTORY):
+        chat_history.pop(0)
+
     print("\nAnswer from LLM:\n")
-    print(response.text)
-    return (response.text, True)
+    print(response)
+    return response

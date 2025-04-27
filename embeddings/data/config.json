@@ -1,0 +1,5 @@
+{
+    "ignore_langs": [],
+    "ignore_types": [".rss", ".py"],
+    "max_files": 0
+}
